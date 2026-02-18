@@ -1,3 +1,8 @@
+cli ;Clear interrupt flag // using because we are modifing Stack Pointer manualt not depending on BIOS anymore
+xor ax,ax ;setting sax redister to 0 we can use mov ax,0 but xor is much faster 
+mov ds, ax ; We set:DS (Data Segment)ES (Extra Segment SS (Stack Segment)To 0.In real mode, memory address = segment * 16 + offset.By setting segments to 0,we simplify addressing.mov es, axmov ss ,ax
+mov sp ,0X7C00 ; stack pointer grows downward so it will grow after the 0x7c00
+sti; Set interrupt flag we cuse Hardware devices now 
 [BITS 16]    ; Becaus cpu starts at 16 bits we need to set this
 [ORG 0X7C00]    ;this is the location where first 512 bytes of memory  BIOS loads  
 
