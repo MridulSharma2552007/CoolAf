@@ -20,7 +20,38 @@ print:
 
 
 done:
-    hlt ; halt Cpu stops execution 
+   xor ax, ax
+   mov es, ax ; ES must be set BEFORE setting BX
+   mov bx, 0x8000 ; memory offset ES:BX = 0x0000:0x8000
+
+   mov ah,0x02 ; BIOS function: read sectors
+   mov al,1 ; read 1 sector
+   mov ch,0 ; cylinder 0
+   mov cl,2 ; sector 2 (stage 0 is in sector 2)
+   mov dh,0 ; head 0
+   mov dl,0x80 ; first hard disk
+
+   int 0x13 ; BIOS disk read
+   jc disk_error ; jump if carry flag set (error)
+
+   jmp 0x0000:0x8000 ; jump to loaded stage 2
+
+disk_error:
+   mov si, error_msg
+   call print_error
+   hlt
+
+print_error:
+   lodsb
+   cmp al,0
+   je error_done
+   mov ah,0x0E
+   int 0x10
+   jmp print_error
+error_done:
+   ret
+
+error_msg db "Disk read error!",0
 
 message db "CoolAf v0.1",0  ; message for printing 
 times 510-($-$$) db 0 ; padding 

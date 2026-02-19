@@ -1,5 +1,0 @@
-[BITS 16]
-[ORG 0X7C00]
-
-start:
- 	mov ah,
