@@ -1,5 +1,5 @@
 cli ;Clear interrupt flag // using because we are modifing Stack Pointer manualt not depending on BIOS anymore
-xor ax,ax ;setting sax redister to 0 we can use mov ax,0 but xor is much faster 
+xor ax,ax ;setting ax redister to 0 we can use mov ax,0 but xor is much faster 
 mov ds, ax ; We set:DS (Data Segment)ES (Extra Segment SS (Stack Segment)To 0.In real mode, memory address = segment * 16 + offset.By setting segments to 0,we simplify addressing.mov es, axmov ss ,ax
 mov sp ,0X7C00 ; stack pointer grows downward so it will grow after the 0x7c00
 sti; Set interrupt flag we cuse Hardware devices now 
@@ -20,9 +20,10 @@ print:
 
 
 done:
-   xor ax, ax
-   mov es, ax ; ES must be set BEFORE setting BX
-   mov bx, 0x8000 ; memory offset ES:BX = 0x0000:0x8000
+   xor ax, ax;=0
+   mov es, ax ; ES must be set BEFORE setting BX // es=0   es=segment 
+   mov bx, 0x8000 ; memory offset ES:BX = 0x0000:0x8000 ; physical = segment * 16 + offset // physical =0 *16 +0x8000  where our stage 0 lives
+
 
    mov ah,0x02 ; BIOS function: read sectors
    mov al,1 ; read 1 sector
