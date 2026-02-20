@@ -54,6 +54,9 @@ error_done:
 
 error_msg db "Disk read error!",0
 
-message db "CoolAf v0.1",0  ; message for printing 
+message db "CoolAf v0.1",13,10
+     
+
+  ; message for printing 
 times 510-($-$$) db 0 ; padding 
 dw 0xAA55 ; dw=Define word BIOS check last two bytes if they are 0x55 , 0xAA bios will boot it  and x86 is little endian thats why we write 0xAA55 = 55 AA  not 0x55A
