@@ -30,7 +30,7 @@ done:
    mov ch,0 ; cylinder 0
    mov cl,2 ; sector 2 (stage 0 is in sector 2)
    mov dh,0 ; head 0
-   mov dl,0x80 ; first hard disk
+
 
    int 0x13 ; BIOS disk read
    jc disk_error ; jump if carry flag set (error)
