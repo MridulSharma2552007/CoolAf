@@ -14,8 +14,12 @@ int 0x10
 jmp print
 
 done:
-hlt
-
+     cli ;disable interupts
+     lgdt[gdt_descriptor]; load gdt Global descriptor table
+     mov eax, cr0 ; read control register
+     or eax,1 ; 
+     mov cr0,eax ; write control register
+     jmp 0x08:protected_mode ; jump to protected mode code segment
 
 
 
