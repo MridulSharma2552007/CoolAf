@@ -1,5 +1,5 @@
 [BITS 16]                   ; 16-bit real mode code
-[ORG 0x8000]                ; Code loaded at memory address 0x8000
+
 
 start:
     cli                     ; Disable interrupts during setup
@@ -69,62 +69,24 @@ gdt_descriptor:
 
 message db "Stage2 Loaded!", 0
 
-
 ; =========================
 ; 32 BIT SECTION
 ; =========================
-[BITS 32]                   ; Now in 32-bit protected mode
+
+[BITS 32]
+global pm_entry
+extern kernel_main   ; Tell assembler this function exists in C
 
 pm_entry:
 
-    mov ax, 0x10            ; 0x10 = data segment selector (offset 16 in GDT)
-    mov ds, ax              ; Set data segment register
-    mov es, ax              ; Set extra segment register
-    mov ss, ax              ; Set stack segment register
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
 
-    mov esp, 0x90000        ; Set stack pointer to 0x90000 (safe memory area)
+    mov esp, 0x90000
 
-    mov dword [cursor_pos], 0   ; Initialize cursor position to 0 (top-left)
-    mov esi, msg32          ; Point ESI to 32-bit message string
-    call print32            ; Call 32-bit print function
-    jmp hang                ; Jump to infinite loop
-
-
-print32:
-    mov edi, 0xB8000        ; EDI = VGA text buffer start address
-
-.next_char:
-    lodsb                   ; Load byte from [ESI] into AL, increment ESI
-    cmp al, 0               ; Check if null terminator (end of string)
-    je .done                ; If zero, we're done printing
-
-    cmp al, 10              ; Check if newline character (ASCII 10)
-    je .newline             ; If newline, handle it separately
-
-    mov ebx, [cursor_pos]   ; Load current cursor position into EBX
-    mov [edi + ebx], al     ; Write character to video memory at cursor position
-    mov byte [edi + ebx + 1], 0x1F  ; Write color attribute (bright white on blue)
-
-    add dword [cursor_pos], 2   ; Move cursor forward by 2 bytes (char + color)
-    jmp .next_char          ; Process next character
-
-.newline:
-    mov eax, [cursor_pos]   ; Load current cursor position
-    mov ecx, 160            ; 160 bytes per row (80 chars × 2 bytes each)
-    xor edx, edx            ; Clear EDX for division
-    div ecx                 ; EAX = current row number, EDX = offset in row
-    inc eax                 ; Move to next row
-    mul ecx                 ; EAX = byte offset of next row start
-    mov [cursor_pos], eax   ; Update cursor position to start of next row
-    jmp .next_char          ; Continue processing characters
-
-.done:
-    ret                     ; Return to caller
-
+    call kernel_main   ; Jump into C
 
 hang:
-    jmp hang                ; Infinite loop - halt CPU execution
-
-
-msg32 db "Welcome to CoolAFOS in 32-bit Protected Mode!", 0  ; Null-terminated string
-cursor_pos dd 0             ; Double word (4 bytes) to store cursor position
+    jmp hang
