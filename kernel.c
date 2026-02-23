@@ -5,7 +5,7 @@ void kernel_main() {
 
     for (int i = 0; msg[i] != 0; i++) {
         video[i * 2] = msg[i];
-        video[i * 2 + 1] = 0x1F; // white on blue
+        video[i * 2 + 1] = 0x1F; // white on blue.
     }
 
     while (1) { }
